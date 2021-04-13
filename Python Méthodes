@@ -1,0 +1,94 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+a=0.03
+b=0.001
+c=0.05
+d=0.0002    
+
+
+def derivee_v(v, t):
+    v=np.array([v[0]*(a-b*v[1]),v[1]*(-c+d*v[0])])
+    return v
+
+def Euler(start, end, step, v_ini, derivee):
+    interval = end - start                     # Intervalle
+    num_points = int(interval / step) + 1      # Nombre d'éléments
+    t = np.linspace(start, end, num_points)    # Tableau temps t
+
+    v = np.empty((2, num_points))
+    v[:, 0] = v_ini
+
+    for i in range(num_points - 1):
+        v[:, i + 1] = v[:, i] + step * derivee(v[:, i], t[i])
+
+    return t, v
+
+v_ini = np.array([200, 50]) 
+t, v = Euler(0, 500, 1, v_ini, derivee_v)
+
+
+v_ini = np.array([200, 50])
+ordre=1
+ti=0
+te=500
+step=1
+
+
+def rk2(start, end, step, v_ini, derivee, ordre):
+    interval = end - start                     # Intervalle
+    num_points = int(interval / step) + 1      # Nombre d'éléments
+    t = np.linspace(start, end, num_points)    # Tableau temps t
+
+    v = np.empty((2, num_points))
+    v[:,0]=v_ini
+
+    for i in range(num_points - 1):
+        d1 = derivee(v[:, i], t[i])
+        v1 = v[:, i] + step / 2 * d1
+        d2 = derivee(v1, t[i] + step / 2)
+        v[:, i + 1] = v1 + step / 2 * d2
+
+    return t, v
+
+t, Drk2 = rk2(ti, te, step, v_ini, derivee_v, ordre)
+
+
+def derivee_v(v, t):
+    v=np.array([v[0]*(a-b*v[1]),v[1]*(-c+d*v[0])])
+    return v
+
+def rk4(start, end, step, v_ini, derivee, ordre):
+    interval = end - start                     # Intervalle
+    num_points = int(interval / step) + 1      # Nombre d'éléments
+    t = np.linspace(start, end, num_points)    # Tableau temps t
+
+    v = np.empty((2, num_points))
+    v[:,0] = v_ini
+
+    for i in range(num_points - 1):
+        d1 = derivee(v[:, i], t[i])
+        d2 = derivee(v[:, i] + step / 2 * d1, t[i] + step / 2)
+        d3 = derivee(v[:, i] + step / 2 * d2, t[i] + step / 2)
+        d4 = derivee(v[:, i] + step * d3, t[i] + step)
+        v[:, i + 1] = v[:, i] + step / 6 * (d1 + 2 * d2 + 2 * d3 + d4)
+
+    return t, v
+
+t, Drk4 = rk4(ti, te,step, v_ini, derivee_v, ordre)
+
+
+
+plt.plot(v[0], v[1],color='orange')
+plt.plot(t,v[0],color='green')
+plt.plot(t,v[1],color='green')
+plt.plot(t, Drk2[0, :],label = 'RK2',color='blue')
+plt.plot(t, Drk4[0, :],label = 'RK4',color='red')
+plt.plot(t, Drk2[1, :],label = 'RK2',color='blue')
+plt.plot(t, Drk4[1, :],label = 'RK4',color='red')
+
+plt.xlabel('temps en quelque chose')
+plt.ylabel('population proie/prédateur')
+plt.title("des trucs jolis")
+plt.axis("equal") # Pour avoir des axes isométriques
+plt.grid()
