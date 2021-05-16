@@ -1,0 +1,35 @@
+ti = 0
+te = 750 
+step = 1
+
+alpha=0.03
+beta=0.001
+gamma=0.05
+delta =0.0002
+
+
+v_ini = np.array([200, 50])
+
+def Lokta(x,y,t):
+    
+    dx = x*(alpha-beta*y)
+    dy = y*(delta*x-gamma)
+    return dx,dy
+
+def Euler_simplectique(start, end, step,v_ini, derivee):
+   
+    t = np.arange(start,end,step)
+    
+    x = np.empty(t.size)
+    y = np.empty(t.size)
+
+    x[0] = v_ini[0]
+    y[0] = v_ini[1]
+
+    for i in range(t.size-1):
+        y[i+1] = y[i] + step * derivee(x[i],y[i],t[i])[1]
+        x[i+1] = x[i] + step * derivee(x[i],y[i+1],t[i])[0] # semi implicite : on utilise y_i+1 et non y_i pour calculer x_i+1.
+    return t, x, y
+
+t,x1,y1 = Euler_simplectique(ti,te,step,v_ini,Lokta)
+plt.plot(t,x1,label ='simplectique ordre 1',color = 'blue')
